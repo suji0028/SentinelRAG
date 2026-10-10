@@ -78,6 +78,7 @@ export const ChatPage = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [authorizedDocuments, setAuthorizedDocuments] = useState<AuthorizedDocument[]>([]);
   const [selectedDocumentId, setSelectedDocumentId] = useState('');
+  const chatLogRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,7 +101,10 @@ export const ChatPage = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const chatLog = chatLogRef.current;
+    if (chatLog) {
+      chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages, loading]);
 
   const handleSend = async (customQuery?: string) => {
@@ -276,7 +280,12 @@ export const ChatPage = () => {
       </section>
 
       {/* Chat Messages Log Area */}
-      <div className="shadcn-card-inset flex-1 p-4 md:p-6 overflow-y-auto min-h-[460px] max-h-[620px] flex flex-col gap-6 rounded-3xl border border-slate-200/60 dark:border-vault-border/80">
+      <div
+        ref={chatLogRef}
+        onWheel={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        className="shadcn-card-inset min-h-[460px] max-h-[620px] min-w-0 flex-1 flex flex-col gap-6 overflow-y-auto overscroll-contain rounded-3xl border border-slate-200/60 p-4 dark:border-vault-border/80 md:p-6"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
